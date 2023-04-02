@@ -1,31 +1,48 @@
+from matplotlib import cm
+
 import DiscreteFourier as Df
 import time
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from matplotlib.colors import LogNorm
 
 
-# function to compare values in an array and print values that are not equal to each other
-def compare_arrays(array1, array2):
-    for i in range(len(array1)):
-        if math.floor(array1[i]) != math.floor(array2[i]):
-            print(f"Index: {i} \t Array1: {array1[i]} \t Array2: {array2[i]}")
+# function that takes the 2D ftt of an image filename and displays it
+def mode_1(filename):
+    original = mpimg.imread(filename)
+    fft = Df.FFT_2D(original)
+
+    # show original and fft
+    plt.subplot(1, 2, 1)
+    plt.imshow(original, cmap=cm.gray)
+    plt.title("Original Image")
+    plt.subplot(1, 2, 2)
+    plt.imshow(np.abs(fft), cmap=cm.gray, norm=LogNorm(vmin=5))
+    plt.title("2DFT of Image")
+
+    plt.show()
 
 
-# Press the green button in the gutter to run the script.
+# image is denoised by applying an FFT, truncating high frequencies and then displayed
+def mode_2(filename):
+    original = mpimg.imread(filename)
+    fft = Df.FFT_2D(original)
+    fft = Df.denoise(fft)
+    inverse = Df.FFT_2D_inverse(fft)
+
+    # show original and fft denoised
+    plt.subplot(1, 2, 1)
+    plt.imshow(original, cmap=cm.gray)
+    plt.title("Original Image")
+    plt.subplot(1, 2, 2)
+    plt.imshow(inverse.real, cmap=cm.gray)
+    plt.title("Denoised Image")
+
+    plt.show()
+
+
 if __name__ == '__main__':
-    print('Discrete Fourier Transform\n\n')
-    signal = [3, 9, 11, 13, 15, 17]
-
-    signal = np.random.randint(0, 10, 1024)
-
-    tic = time.perf_counter()
-    naive = Df.naive_transform(signal)
-    toc = time.perf_counter()
-    print(f"Naive in  {toc - tic:0.4f} seconds")
-
-
-    tic = time.perf_counter()
-    berkeley = Df.FFT(signal)
-    toc = time.perf_counter()
-    print(f"Berkeley in  {toc - tic:0.4f} seconds \n\n")
-
+    mode_1("moonlanding.png")
+    #mode_2("moonlanding.png")
