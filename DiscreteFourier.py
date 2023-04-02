@@ -124,6 +124,6 @@ def FFT_2D_inverse(matrix: np.ndarray):
 
 
 def denoise(fft, threshold=0.9):
-    threshold = (1-threshold) * np.max(fft)
-    fft[abs(fft) < threshold] = 0
+    threshold = (1 - threshold) * np.max(fft)
+    fft[abs(fft) > threshold] = 0
     return fft
