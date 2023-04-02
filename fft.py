@@ -1,5 +1,4 @@
 from matplotlib import cm
-
 import DiscreteFourier as Df
 import time
 import numpy as np
@@ -7,6 +6,9 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm
+import argparse
+
+import testing
 
 
 # function that takes the 2D ftt of an image filename and displays it
@@ -44,5 +46,6 @@ def mode_2(filename):
 
 
 if __name__ == '__main__':
-    mode_1("moonlanding.png")
+    testing.test_1D_DFT("moonlanding.png")
+    # mode_1("moonlanding.png")
     #mode_2("moonlanding.png")

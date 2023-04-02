@@ -1,7 +1,13 @@
 import numpy as np
 
 
-def naive_transform(signal):
+def DFT_1D_naive(signal: np.ndarray):
+    """
+    Naive implementation of the DFT
+    :param signal: 1D signal
+    :return: 1D DFT of the signal
+    """
+
     N = len(signal)
     fourier = np.zeros(N, dtype=np.complex_)
 
@@ -11,7 +17,12 @@ def naive_transform(signal):
     return fourier
 
 
-def naive_inverse(signal):
+def naive_inverse(signal: np.ndarray):
+    """
+    Naive implementation of the inverse DFT
+    :param signal: 1D signal
+    :return: 1D inverse DFT of the signal
+    """
     N = len(signal)
     fourier = np.zeros(N, dtype=np.complex_)
 
@@ -21,19 +32,26 @@ def naive_inverse(signal):
     return fourier / N
 
 
-def FFT_1D(signal):
+def FFT_1D(signal: np.ndarray, threshold=4):
+    """
+    Fast implementation of the DFT
+    :param signal: 1D signal
+    :param threshold: threshold for the naive implementation
+    :return: 1D DFT of the signal
+    """
     N = len(signal)
 
-    # Threshold of 4 returns the fastest result
-    if N <= 4:
-        return naive_transform(signal)
+    if N <= threshold:
+        return DFT_1D_naive(signal)
     else:
-        X_even = FFT_1D(signal[::2])
-        X_odd = FFT_1D(signal[1::2])
+        X_even = FFT_1D(signal[::2], threshold)
+        X_odd = FFT_1D(signal[1::2], threshold)
         factor = np.exp(-2j * np.pi * np.arange(N) / N)
 
-        X = np.concatenate([X_even + factor[:int(N / 2)] * X_odd, X_even + factor[int(N / 2):] * X_odd])
-        return X
+        N_half = int(N / 2)
+        left = X_even + factor[:N_half] * X_odd
+        right = X_even + factor[N_half:] * X_odd
+        return np.concatenate([left, right])
 
 
 def inverse_inter(signal):
