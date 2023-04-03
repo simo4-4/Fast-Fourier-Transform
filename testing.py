@@ -1,3 +1,5 @@
+from random import random
+
 from matplotlib import cm
 
 import DiscreteFourier as Df
@@ -8,97 +10,162 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.colors import LogNorm
 
-# function to compare values in an array and print values that are not equal to each other
-def compare_arrays(array1, array2):
-    for i in range(len(array1)):
-        if math.floor(array1[i]) != math.floor(array2[i]):
-            print(f"Index: {i} \t Array1: {array1[i]} \t Array2: {array2[i]}")
 
-
-def test_1D_DFT(filename: str):
+def test_1D_DFT():
     """
     Test the 1D DFT function
-    :param filename:
-    :return:
     """
 
-    # test for 100 random arrays
-    for i in range(100):
-        data: np.ndarray = np.random.randint(0, 100, 128)
+    # test for X random arrays
+    n = 5
+    size = 1024
+    for i in range(n):
+        # Random array must have a power of 2 length
+        data: np.ndarray = np.random.randint(0, 256, size)
+
+        start = time.time()
         dft1 = Df.DFT_1D_naive(data)
+        print(f"Time for naive: {time.time() - start} seconds")
+
         dft2 = np.fft.fft(data)
 
         # compare the results
         equal = np.allclose(dft1, dft2)
         if not equal:
-            print(f"Arrays are not equal for array {i}")
-            # Shape
-            print(f"Shape 1: {dft1.shape}")
-            print(f"Shape 2: {dft2.shape}")
-
-            # Values
-            print(f"Array 1: {dft1[:10]}")
-            print(f"Array 2: {dft2[:10]}")
+            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
             break
 
-        dft3 = Df.FFT_1D(data, threshold=16)
+        start = time.time()
+        dft3 = Df.FFT_1D(data, threshold=4)
+        print(f"Time for FFT: {time.time() - start} seconds")
+
         equal = np.allclose(dft2, dft3)
         if not equal:
-            print(f"Arrays are not equal for array {i}")
-            # Shape
-            print(f"Shape 2: {dft2.shape}")
-            print(f"Shape 3: {dft3.shape}")
-
-            # Values
-            print(f"Array 2: {dft2[:10]}")
-            print(f"Array 3: {dft3[:10]}")
+            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
             break
 
 
+def test_1D_IDFT():
+    """
+    Test the 1D IDFT function
+    """
 
-def test_mode_1(filename):
-    # original = mpimg.imread(filename)
-    original = np.array([[1, 2, 3, 4, 5, 6, 7, 8]])
+    # test for X random arrays
+    n = 100
+    size = 128
+    for i in range(n):
+        # Random array must have a power of 2 length
+        data: np.ndarray = np.random.randint(0, 256, size)
 
-    fft = Df.FFT_2D_numpy(original)
-    fft2 = Df.FFT_2D(original)
-    fft_np = np.fft.fft2(original)
+        dft1 = Df.IDFT_1D_naive(data)
+        dft2 = np.fft.ifft(data)
 
-    # inverse using my inverse function
-    inverse = Df.FFT_2D_inverse(fft)
-    inverse_np = Df.FFT_2D_inverse(fft_np)
+        # compare the results
+        equal = np.allclose(dft1, dft2)
+        if not equal:
+            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
+            break
 
-    # inverse using np inverse fucntion
-    inverse_npm = np.fft.ifft2(fft)
-    inverse_np2 = np.fft.ifft2(fft_np)
+        dft3 = Df.IFFT_1D(data)
+        equal = np.allclose(dft2, dft3)
+        if not equal:
+            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
+            break
 
-    # plot all the results
-    # plt.subplot(3, 3, 1)
-    # plt.imshow(original, cmap=cm.gray)
-    # plt.title("Original")
-    #
-    # plt.subplot(3, 3, 2)
-    # plt.imshow(fft, cmap=cm.gray, norm=LogNorm())
-    # plt.title("2DFT us")
-    #
-    # plt.subplot(3, 3, 3)
-    # plt.imshow(fft_np, cmap=cm.gray, norm=LogNorm())
-    # plt.title("2DFT Numpy")
 
-    # plt.subplot(3, 3, 4)
-    # plt.imshow(inverse.real, cmap=cm.gray)
-    # plt.title("Inverse of 2DFT of Image ECSE316")
-    #
-    # plt.subplot(3, 3, 5)
-    # plt.imshow(inverse_np.real, cmap=cm.gray)
-    # plt.title("Inverse of 2DFT using Numpy")
-    #
-    # plt.subplot(3, 3, 6)
-    # plt.imshow(inverse_npm.real, cmap=cm.gray)
-    # plt.title("Inverse of 2DFT using Numpy")
-    #
-    # plt.subplot(3, 3, 7)
-    # plt.imshow(inverse_np2.real, cmap=cm.gray)
-    # plt.title("Inverse of 2DFT using Numpy")
+def test_pad_signal():
+    """
+    Test the pad_signal function
+    """
 
-    plt.show()
+    for i in range(10, 100):
+        # Random array must have a power of 2 length
+        data: np.ndarray = np.random.randint(0, 256, (i, i))
+
+        padded_signal = Df.pad_signal(data)
+        # print("Shape: ", data.shape, ", padded shape: ", padded_signal.shape)
+        equal = np.allclose(data, padded_signal[:i, :i])
+
+        r, c = padded_signal.shape
+        correct_size = math.log2(r).is_integer()
+        correct_size = correct_size and math.log2(c).is_integer() and r == c
+
+        # Check is all extra values are 0
+        correct_extra = np.allclose(padded_signal[i:, :], np.zeros((r - i, c)))
+        correct_extra = correct_extra and np.allclose(padded_signal[:, i:], np.zeros((r, c - i)))
+        correct_extra = correct_extra and np.allclose(padded_signal[i:, i:], np.zeros((r - i, c - i)))
+
+        if not equal or not correct_size or not correct_extra:
+            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {padded_signal.shape}")
+            break
+
+
+def test_remove_padding():
+    """
+    Test the remove_padding function
+    """
+
+    for i in range(10, 100):
+        # Random array must have a power of 2 length
+        data: np.ndarray = np.random.randint(0, 256, (i, i))
+
+        padded_signal = Df.pad_signal(data)
+        equal = np.allclose(data, Df.remove_padding(data, padded_signal))
+
+        if not equal:
+            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {padded_signal.shape}")
+            break
+
+
+def test_2D_DFT():
+    """
+    Test the 2D DFT function
+    """
+
+    n = 50
+    size = (16, 16)
+    for i in range(n):
+        data: np.ndarray = np.random.randint(0, 256, size)
+
+        dft2 = Df.FFT_2D(data)
+        dft2_np = np.fft.fft2(data)
+        df2n = Df.DFT_2D_naive(data)
+
+        # compare the results
+        equal = np.allclose(dft2, dft2_np)
+        if not equal:
+            print(
+                f"Arrays are not equal for array {i}, "
+                f"shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft2_np.shape}")
+            print(dft2[:2, :2])
+            print(dft2_np[:2, :2])
+            break
+
+        equal = np.allclose(dft2_np, df2n)
+        if not equal:
+            print(
+                f"Arrays are not equal for array {i}, "
+                f"shape: {data.shape}, shape1: {dft2_np.shape}, shape2: {df2n.shape}")
+            break
+
+
+def test_2D_IDFT():
+    """
+    Test the 2D DFT function
+    """
+
+    n = 100
+    size = (128, 128)
+    for i in range(n):
+        data: np.ndarray = np.random.randint(0, 256, size)
+
+        idft2 = Df.IFFT_2D(data)
+        idft2_np = np.fft.ifft2(data)
+
+        # compare the results
+        equal = np.allclose(idft2, idft2_np)
+        if not equal:
+            print(
+                f"Arrays are not equal for array {i}, "
+                f"shape: {data.shape}, shape1: {idft2.shape}, shape2: {idft2_np.shape}")
+            break
