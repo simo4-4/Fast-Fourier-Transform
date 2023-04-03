@@ -1,0 +1,29 @@
+Output from denoising tests:
+
+Denoising with threshold 0.05:
+Number of non-zero values: 5253 out of 524288.
+Percentage of non-zero values: 1.0019302368164062%
+
+Denoising with threshold 0.1:
+Number of non-zero values: 21115 out of 524288.
+Percentage of non-zero values: 4.027366638183594%
+
+Denoising with threshold 0.15:
+Number of non-zero values: 46971 out of 524288.
+Percentage of non-zero values: 8.959007263183594%
+
+Denoising with threshold 0.2:
+Number of non-zero values: 83845 out of 524288.
+Percentage of non-zero values: 15.992164611816406%
+
+Denoising with threshold 0.25:
+Number of non-zero values: 131072 out of 524288.
+Percentage of non-zero values: 25.0%
+
+Denoising with threshold 0.3:
+Number of non-zero values: 188805 out of 524288.
+Percentage of non-zero values: 36.011695861816406%
+
+Denoising with threshold 0.35:
+Number of non-zero values: 257403 out of 524288.
+Percentage of non-zero values: 49.095726013183594%

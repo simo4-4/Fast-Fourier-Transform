@@ -2,9 +2,7 @@ import DiscreteFourier as df
 import time
 import numpy as np
 import math
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from matplotlib.colors import LogNorm
+import argparse
 
 
 def test_1D_DFT():
@@ -13,7 +11,7 @@ def test_1D_DFT():
     """
 
     # test for X random arrays
-    n = 5
+    n = 50
     size = 1024
     for i in range(n):
         # Random array must have a power of 2 length
@@ -126,7 +124,7 @@ def test_2D_DFT():
         dft2_np = np.fft.fft2(data)
 
         start = time.time()
-        dft2 = df.FFT_2D(data)
+        dft2 = df.FFT_2D(data, threshold=2)
         print(f"Time for FFT: {time.time() - start: 0.5f} seconds")
 
         start = time.time()
@@ -174,20 +172,38 @@ def test_2D_IDFT():
 
 
 if __name__ == '__main__':
-    # print("Testing 1D DFT")
-    # test_1D_DFT()
-    #
-    # print("Testing 1D IDFT")
-    # test_1D_IDFT()
-    #
-    # print("Testing padding")
-    # test_pad_signal()
-    #
-    # print("Testing remove padding")
-    # test_remove_padding()
 
-    print("Testing 2D DFT")
-    test_2D_DFT()
+    parser = argparse.ArgumentParser(description='Test the DFT functions')
+    parser.add_argument('--all', action='store_true', help='Run the tests')
+    parser.add_argument('-o', action='store_true', help='Run the 1D tests')
+    parser.add_argument('-t', action='store_true', help='Run the 2D tests')
+    parser.add_argument('-p', action='store_true', help='Run the padding tests')
 
-    # print("Testing 2D IDFT")
-    # test_2D_IDFT()
+    args = parser.parse_args()
+
+    if args.all:
+        print("Testing all functions")
+        args.o = True
+        args.t = True
+        args.p = True
+
+    if args.o:
+        print("Testing 1D DFT")
+        test_1D_DFT()
+
+        print("Testing 1D IDFT")
+        test_1D_IDFT()
+
+    if args.p:
+        print("Testing padding")
+        test_pad_signal()
+
+        print("Testing remove padding")
+        test_remove_padding()
+
+    if args.t:
+        print("Testing 2D DFT")
+        test_2D_DFT()
+
+        print("Testing 2D IDFT")
+        test_2D_IDFT()

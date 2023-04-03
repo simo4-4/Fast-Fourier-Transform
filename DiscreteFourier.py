@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def assert_power_of_2(n: int):
+    assert (n & (n - 1)) == 0, "Signal must have a length that is a power of 2"
+
+
 def DFT_1D_naive(signal: np.ndarray) -> np.ndarray:
     """
     Naive implementation of the DFT
@@ -8,6 +12,7 @@ def DFT_1D_naive(signal: np.ndarray) -> np.ndarray:
     :return: 1D DFT of the signal
     """
     N = len(signal)
+
     fourier = np.zeros(N, dtype=np.complex_)
 
     for k in range(N):
@@ -42,6 +47,7 @@ def FFT_1D(signal: np.ndarray, threshold=4) -> np.ndarray:
     :return: 1D DFT of the signal
     """
     N = len(signal)
+    assert_power_of_2(N)
 
     if N <= threshold:
         return DFT_1D_naive(signal)
@@ -64,6 +70,7 @@ def IFFT_1D(signal: np.ndarray) -> np.ndarray:
     """
     def ifft(sig: np.ndarray):
         N = len(sig)
+        assert_power_of_2(N)
 
         if N <= 1:
             return sig.copy()
@@ -87,8 +94,9 @@ def DFT_2D_naive(matrix: np.ndarray) -> np.ndarray:
     :return: 2D DFT of the signal
     """
 
-    # Vectorized implementation of the 2D DFT (slightly faster than the single 4 nested loops implementation)
     N, M = matrix.shape
+
+    # Vectorized implementation of the 2D DFT (slightly faster than the single 4 nested loops implementation)
     k, l, n, m = np.meshgrid(np.arange(N), np.arange(M), np.arange(N), np.arange(M), indexing='ij')
     fourier = np.sum(matrix * np.exp((-2j * np.pi * (k * n / N + l * m / M))), axis=(2, 3))
 
@@ -102,6 +110,8 @@ def FFT_2D(matrix: np.ndarray, threshold=4) -> np.ndarray:
     :param threshold: threshold to use the naive implementation
     :return: 2D DFT of the signal
     """
+    assert_power_of_2(matrix.shape[0])
+    assert_power_of_2(matrix.shape[1])
     output = np.zeros(matrix.shape, dtype=np.complex_)
 
     # Take 1D FTT of Rows
@@ -122,6 +132,8 @@ def IFFT_2D(matrix: np.ndarray) -> np.ndarray:
     :param matrix: 2D signal
     :return: 2D inverse DFT of the signal
     """
+    assert_power_of_2(matrix.shape[0])
+    assert_power_of_2(matrix.shape[1])
     output = np.zeros(matrix.shape, dtype=np.complex_)
 
     # Take 1D FTT of Rows
@@ -146,6 +158,9 @@ def pad_signal(signal: np.ndarray) -> np.ndarray:
     rows, cols = signal.shape
     n = 2 ** (rows - 1).bit_length()
     m = 2 ** (cols - 1).bit_length()
+
+    assert_power_of_2(n)
+    assert_power_of_2(m)
 
     # create a new array with the new dimensions
     padded_signal = np.zeros((n, m), dtype=np.complex_)
@@ -190,6 +205,7 @@ def denoise(signal: np.ndarray, threshold=0.1) -> np.ndarray:
     total = rows * cols
     total_zeros = np.count_nonzero(signal == 0)
     total_non_zeros = total - total_zeros
+    print(f"Denoising with threshold {threshold}:")
     print(f"Number of non-zero values: {total_non_zeros} out of {total}.")
     print(f"Percentage of non-zero values: {total_non_zeros / total * 100}%")
     print()

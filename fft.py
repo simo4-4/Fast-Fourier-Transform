@@ -77,7 +77,7 @@ def mode_3(matrix: np.ndarray):
     padding = df.pad_signal(matrix)
     fft = df.FFT_2D(padding)
 
-    compression_levels = [0.0, 0.1, 0.2, 0.4, 0.65, 0.95]
+    compression_levels = [0.0, 0.1, 0.25, 0.5, 0.70, 0.95]
 
     plt.figure(figsize=(12, 8))
 
@@ -87,7 +87,8 @@ def mode_3(matrix: np.ndarray):
         inverse = df.remove_padding(matrix, inverse)
 
         # Save fft_compressed non-zero coefficients to file
-        np.savetxt(f"compressed_files/fft_compressed_{compression_level}.txt", fft_compressed[fft_compressed != 0])
+        np.savetxt(f"results/compressed_files/fft_compressed_{compression_level}.txt"
+                   , fft_compressed[fft_compressed != 0])
 
         plt.subplot(2, 3, i + 1)
         plt.imshow(np.abs(inverse), cmap='gray')
@@ -177,7 +178,7 @@ def plot_data(data: dict, keys: list[int]):
     plt.ylabel("Time Taken (s)")
     plt.title("Time taken for 2D Naive DFT, 2D FFT and Numpy FFT")
     plt.legend()
-    plt.savefig("naive-vs-fft-vs-numpy.png")
+    plt.savefig("results/naive-vs-fft-vs-numpy.png")
     plt.show()
 
     # Point plot with error bars for standard deviation with 2D FFT and Numpy FFT
@@ -193,7 +194,7 @@ def plot_data(data: dict, keys: list[int]):
     plt.ylabel("Time Taken (s)")
     plt.title("Time taken for 2D FFT and Numpy FFT")
     plt.legend()
-    plt.savefig("fft-vs-numpy.png")
+    plt.savefig("results/fft-vs-numpy.png")
     plt.show()
 
 
