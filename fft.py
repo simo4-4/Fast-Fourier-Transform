@@ -6,7 +6,7 @@ from matplotlib.colors import LogNorm
 from matplotlib import image as mpimg
 import pprint
 import argparse
-
+import os
 
 def mode_1(matrix: np.ndarray):
     """
@@ -51,7 +51,7 @@ def mode_2_testing(matrix: np.ndarray):
     padding = df.pad_signal(matrix)
     fft = df.FFT_2D(padding)
 
-    denoise_levels = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.45]
+    denoise_levels = [0.05, 0.08, 0.085, 0.09, 0.1, 0.2, 0.35, 0.45]
 
     # Show original image
     plt.figure(figsize=(8, 8))

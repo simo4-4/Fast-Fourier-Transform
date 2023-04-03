@@ -68,6 +68,7 @@ def IFFT_1D(signal: np.ndarray) -> np.ndarray:
     :param signal: 1D signal
     :return: 1D inverse DFT of the signal
     """
+
     def ifft(sig: np.ndarray):
         N = len(sig)
         assert_power_of_2(N)
@@ -192,19 +193,11 @@ def denoise(signal: np.ndarray, threshold=0.1) -> np.ndarray:
     signal = signal.copy()
     rows, cols = signal.shape
 
-    row_low_freq = int(rows * threshold)
-    row_high_freq = int(rows * (1 - threshold))
-    signal[row_low_freq:row_high_freq, :] = 0
-    # print("Removing rows {} to {}".format(row_low_freq, row_high_freq))
-
-    col_low_freq = int(cols * threshold)
-    col_high_freq = int(cols * (1 - threshold))
-    signal[:, col_low_freq:col_high_freq] = 0
-    # print("Removing columns {} to {}".format(col_low_freq, col_high_freq))
+    # filter signal
+    signal = signal * high_low_frequency_filter(signal.shape, threshold)
 
     total = rows * cols
-    total_zeros = np.count_nonzero(signal == 0)
-    total_non_zeros = total - total_zeros
+    total_non_zeros = np.count_nonzero(signal)
     print(f"Denoising with threshold {threshold}:")
     print(f"Number of non-zero values: {total_non_zeros} out of {total}.")
     print(f"Percentage of non-zero values: {total_non_zeros / total * 100}%")
@@ -241,13 +234,89 @@ def compress(signal: np.ndarray, compression_level: float) -> np.ndarray:
     return compressed
 
 
+# Filters for denoise
+def high_frequency_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    """
+    Create a high frequency filter
+    :param dimensions: dimensions of the filter
+    :param threshold: threshold of when to use the naive implementation
+    :return: 2D high frequency filter
+    """
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.ones((N, M))
+    filter[int(N * threshold):int(N * (1 - threshold)), :] = 0
+
+    return filter
 
 
+def high_low_frequency_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    """
+    Create a high and low frequency filter
+    :param dimensions: dimensions of the filter
+    :param threshold: threshold of when to use the naive implementation
+    :return: 2D high and low frequency filter
+    """
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.ones((N, M))
+    filter[int(N * threshold):int(N * (1 - threshold)), :] = 0
+    filter[:, int(M * threshold):int(M * (1 - threshold))] = 0
+
+    return filter
 
 
+def inverse_high_frequency_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    """
+    Create a high frequency filter
+    :param dimensions: dimensions of the filter
+    :param threshold: threshold of when to use the naive implementation
+    :return: 2D high frequency filter
+    """
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.zeros((N, M))
+    filter[int(N * threshold):int(N * (1 - threshold)), :] = 1
+
+    return filter
 
 
+def inverse_high_low_frequency_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    """
+    Create a high and low frequency filter
+    :param dimensions: dimensions of the filter
+    :param threshold: threshold of when to use the naive implementation
+    :return: 2D high and low frequency filter
+    """
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.zeros((N, M))
+    filter[int(N * threshold):int(N * (1 - threshold)), :] = 1
+    filter[:, int(M * threshold):int(M * (1 - threshold))] = 1
+
+    return filter
 
 
+# makes a rectangle composed of 0 in the middle of the image
+def rectangle_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.ones((N, M))
+    filter[int(N * threshold):int(N * (1 - threshold)), int(M * threshold):int(M * (1 - threshold))] = 0
+
+    return filter
 
 
+def inverse_rectangle_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.zeros((N, M))
+    filter[int(N * threshold):int(N * (1 - threshold)), int(M * threshold):int(M * (1 - threshold))] = 1
+
+    return filter

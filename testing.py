@@ -3,6 +3,9 @@ import time
 import numpy as np
 import math
 import argparse
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from matplotlib.colors import LogNorm
 
 
 def test_1D_DFT():
@@ -26,7 +29,8 @@ def test_1D_DFT():
         # compare the results
         equal = np.allclose(dft1, dft2)
         if not equal:
-            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
+            print(
+                f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
             break
 
         start = time.time()
@@ -35,7 +39,8 @@ def test_1D_DFT():
 
         equal = np.allclose(dft2, dft3)
         if not equal:
-            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
+            print(
+                f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
             break
 
 
@@ -57,13 +62,15 @@ def test_1D_IDFT():
         # compare the results
         equal = np.allclose(dft1, dft2)
         if not equal:
-            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
+            print(
+                f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
             break
 
         dft3 = df.IFFT_1D(data)
         equal = np.allclose(dft2, dft3)
         if not equal:
-            print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
+            print(
+                f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
             break
 
 
@@ -169,6 +176,38 @@ def test_2D_IDFT():
                 f"Arrays are not equal for array {i}, "
                 f"shape: {data.shape}, shape1: {idft2.shape}, shape2: {idft2_np.shape}")
             break
+
+def test_high_freq_filter():
+    matrix = mpimg.imread("moonlanding.png")
+
+    padding = df.pad_signal(matrix)
+    fft = df.FFT_2D(padding)
+    fft = np.fft.ifftshift(fft)
+
+    denoise_levels = [0.405, 0.415, 0.42, 0.45, 0.48]
+
+    # Show original image
+    plt.figure(figsize=(8, 8))
+    plt.title("Denoised Images")
+
+    plt.subplot(3, 3, 1)
+    plt.imshow(matrix, cmap='gray')
+    plt.title("Original Image")
+
+    for i, denoise_level in enumerate(denoise_levels):
+        filter = df.inverse_rectangle_filter(fft.shape, denoise_level)
+        fft_denoised = fft * filter
+        fft_denoised = np.fft.fftshift(fft_denoised)
+        fft_denoised = df.IFFT_2D(fft_denoised)
+        fft_denoised = df.remove_padding(matrix, fft_denoised)
+
+        plt.subplot(3, 3, i + 2)
+        plt.imshow((np.abs(fft_denoised)), cmap='gray')
+
+        # plt.imshow(np.log(np.abs(fft)), cmap='gray')
+        plt.title(f"D Level: {denoise_level}")
+
+    plt.show()
 
 
 if __name__ == '__main__':
