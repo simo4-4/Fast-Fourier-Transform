@@ -1,8 +1,4 @@
-from random import random
-
-from matplotlib import cm
-
-import DiscreteFourier as Df
+import DiscreteFourier as df
 import time
 import numpy as np
 import math
@@ -24,7 +20,7 @@ def test_1D_DFT():
         data: np.ndarray = np.random.randint(0, 256, size)
 
         start = time.time()
-        dft1 = Df.DFT_1D_naive(data)
+        dft1 = df.DFT_1D_naive(data)
         print(f"Time for naive: {time.time() - start} seconds")
 
         dft2 = np.fft.fft(data)
@@ -36,7 +32,7 @@ def test_1D_DFT():
             break
 
         start = time.time()
-        dft3 = Df.FFT_1D(data, threshold=4)
+        dft3 = df.FFT_1D(data, threshold=4)
         print(f"Time for FFT: {time.time() - start} seconds")
 
         equal = np.allclose(dft2, dft3)
@@ -57,7 +53,7 @@ def test_1D_IDFT():
         # Random array must have a power of 2 length
         data: np.ndarray = np.random.randint(0, 256, size)
 
-        dft1 = Df.IDFT_1D_naive(data)
+        dft1 = df.IDFT_1D_naive(data)
         dft2 = np.fft.ifft(data)
 
         # compare the results
@@ -66,7 +62,7 @@ def test_1D_IDFT():
             print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft1.shape}, shape2: {dft2.shape}")
             break
 
-        dft3 = Df.IFFT_1D(data)
+        dft3 = df.IFFT_1D(data)
         equal = np.allclose(dft2, dft3)
         if not equal:
             print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {dft2.shape}, shape2: {dft3.shape}")
@@ -82,7 +78,7 @@ def test_pad_signal():
         # Random array must have a power of 2 length
         data: np.ndarray = np.random.randint(0, 256, (i, i))
 
-        padded_signal = Df.pad_signal(data)
+        padded_signal = df.pad_signal(data)
         # print("Shape: ", data.shape, ", padded shape: ", padded_signal.shape)
         equal = np.allclose(data, padded_signal[:i, :i])
 
@@ -109,8 +105,8 @@ def test_remove_padding():
         # Random array must have a power of 2 length
         data: np.ndarray = np.random.randint(0, 256, (i, i))
 
-        padded_signal = Df.pad_signal(data)
-        equal = np.allclose(data, Df.remove_padding(data, padded_signal))
+        padded_signal = df.pad_signal(data)
+        equal = np.allclose(data, df.remove_padding(data, padded_signal))
 
         if not equal:
             print(f"Arrays are not equal for array {i}, shape: {data.shape}, shape1: {padded_signal.shape}")
@@ -122,14 +118,20 @@ def test_2D_DFT():
     Test the 2D DFT function
     """
 
-    n = 50
-    size = (16, 16)
+    n = 5
+    size = (64, 64)
     for i in range(n):
         data: np.ndarray = np.random.randint(0, 256, size)
 
-        dft2 = Df.FFT_2D(data)
         dft2_np = np.fft.fft2(data)
-        df2n = Df.DFT_2D_naive(data)
+
+        start = time.time()
+        dft2 = df.FFT_2D(data)
+        print(f"Time for FFT: {time.time() - start: 0.5f} seconds")
+
+        start = time.time()
+        df2n = df.DFT_2D_naive(data)
+        print(f"Time for naive: {time.time() - start: 0.5f} seconds")
 
         # compare the results
         equal = np.allclose(dft2, dft2_np)
@@ -159,7 +161,7 @@ def test_2D_IDFT():
     for i in range(n):
         data: np.ndarray = np.random.randint(0, 256, size)
 
-        idft2 = Df.IFFT_2D(data)
+        idft2 = df.IFFT_2D(data)
         idft2_np = np.fft.ifft2(data)
 
         # compare the results
@@ -169,3 +171,23 @@ def test_2D_IDFT():
                 f"Arrays are not equal for array {i}, "
                 f"shape: {data.shape}, shape1: {idft2.shape}, shape2: {idft2_np.shape}")
             break
+
+
+if __name__ == '__main__':
+    # print("Testing 1D DFT")
+    # test_1D_DFT()
+    #
+    # print("Testing 1D IDFT")
+    # test_1D_IDFT()
+    #
+    # print("Testing padding")
+    # test_pad_signal()
+    #
+    # print("Testing remove padding")
+    # test_remove_padding()
+
+    print("Testing 2D DFT")
+    test_2D_DFT()
+
+    # print("Testing 2D IDFT")
+    # test_2D_IDFT()
