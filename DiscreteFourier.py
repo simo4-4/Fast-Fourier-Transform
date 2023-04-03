@@ -1,4 +1,6 @@
+import math
 import numpy as np
+from scipy.signal import convolve2d
 
 
 def assert_power_of_2(n: int):
@@ -204,6 +206,23 @@ def denoise(signal: np.ndarray, threshold=0.1) -> np.ndarray:
     print()
 
     return signal
+
+
+def estimate_noise_level(matrix: np.ndarray):
+    """
+    Estimate the noise level is an image signal.
+    Code inspired from https://stackoverflow.com/questions/2440504/noise-estimation-noise-measurement-in-image
+    :param matrix: image signal
+    :return: estimated noise level
+    """
+    N, M = matrix.shape
+
+    kernel = [[1, -2, 1], [-2, 4, -2], [1, -2, 1]]
+
+    sigma = np.sum(np.sum(np.absolute(convolve2d(matrix, kernel))))
+    sigma = sigma * math.sqrt(0.5 * math.pi) / (6 * (M - 2) * (N - 2))
+
+    return sigma
 
 
 def compress(signal: np.ndarray, compression_level: float) -> np.ndarray:

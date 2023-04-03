@@ -4,9 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib import image as mpimg
-import pprint
 import argparse
-import os
+
 
 def mode_1(matrix: np.ndarray):
     """
@@ -66,6 +65,8 @@ def mode_2_testing(matrix: np.ndarray):
         inverse = df.IFFT_2D(fft_denoised)
         inverse = df.remove_padding(matrix, inverse)
 
+        # print(f"Denoised {denoise_level}. Estimated noise level: {df.get_noise_level(inverse)}")
+
         plt.subplot(3, 3, i + 2)
         plt.imshow(np.abs(inverse), cmap='gray')
         plt.title(f"D Level: {denoise_level}")
@@ -87,8 +88,8 @@ def mode_3(matrix: np.ndarray):
         inverse = df.remove_padding(matrix, inverse)
 
         # Save fft_compressed non-zero coefficients to file
-        np.savetxt(f"results/compressed_files/fft_compressed_{compression_level}.txt"
-                   , fft_compressed[fft_compressed != 0])
+        np.savetxt(f"results/compressed_files/fft_compressed_{compression_level}.txt",
+                   fft_compressed[fft_compressed != 0])
 
         plt.subplot(2, 3, i + 1)
         plt.imshow(np.abs(inverse), cmap='gray')
@@ -137,7 +138,7 @@ def mode_4():
 
 def plot_data(data: dict, keys: list[int]):
     """
-    Plot the data
+    Plot the data.
     :param data: the data to plot
     :param keys: the keys to use for the x-axis
     """
@@ -196,7 +197,6 @@ def plot_data(data: dict, keys: list[int]):
     plt.legend()
     plt.savefig("results/fft-vs-numpy.png")
     plt.show()
-
 
 
 def main():

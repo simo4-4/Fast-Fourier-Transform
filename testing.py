@@ -5,7 +5,6 @@ import math
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from matplotlib.colors import LogNorm
 
 
 def test_1D_DFT():
@@ -176,6 +175,7 @@ def test_2D_IDFT():
                 f"Arrays are not equal for array {i}, "
                 f"shape: {data.shape}, shape1: {idft2.shape}, shape2: {idft2_np.shape}")
             break
+
 
 def test_high_freq_filter():
     matrix = mpimg.imread("moonlanding.png")

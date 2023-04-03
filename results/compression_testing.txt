@@ -1,0 +1,23 @@
+For compression level 0.0%:
+Number of non-zero values: 524288 out of 524288.
+Percentage of non-zero values: 100.0%
+
+For compression level 10.0%:
+Number of non-zero values: 471860 out of 524288.
+Percentage of non-zero values: 90.00015258789062%
+
+For compression level 25.0%:
+Number of non-zero values: 393216 out of 524288.
+Percentage of non-zero values: 75.0%
+
+For compression level 50.0%:
+Number of non-zero values: 262144 out of 524288.
+Percentage of non-zero values: 50.0%
+
+For compression level 70.0%:
+Number of non-zero values: 157288 out of 524288.
+Percentage of non-zero values: 30.00030517578125%
+
+For compression level 95.0%:
+Number of non-zero values: 26216 out of 524288.
+Percentage of non-zero values: 5.00030517578125%
