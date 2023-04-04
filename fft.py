@@ -167,7 +167,7 @@ def plot_data(data: dict, keys: list[int]):
             variance[function_name] = {}
         for size, times in function_data.items():
             means[function_name][size] = np.mean(times)
-            std_devs[function_name][size] = np.std(times)
+            std_devs[function_name][size] = np.std(times) * 2
             variance[function_name][size] = np.var(times)
 
     # Print
