@@ -98,12 +98,15 @@ def DFT_2D_naive(matrix: np.ndarray) -> np.ndarray:
     """
 
     N, M = matrix.shape
+    output = np.zeros(matrix.shape, dtype=np.complex_)
 
-    # Vectorized implementation of the 2D DFT (slightly faster than the single 4 nested loops implementation)
-    k, l, n, m = np.meshgrid(np.arange(N), np.arange(M), np.arange(N), np.arange(M), indexing='ij')
-    fourier = np.sum(matrix * np.exp((-2j * np.pi * (k * n / N + l * m / M))), axis=(2, 3))
+    for col in range(M):
+        output[:, col] = DFT_1D_naive(matrix[:, col])
 
-    return fourier
+    for row in range(N):
+        output[row, :] = DFT_1D_naive(output[row, :])
+
+    return output
 
 
 def FFT_2D(matrix: np.ndarray, threshold=4) -> np.ndarray:
@@ -183,13 +186,13 @@ def remove_padding(original_signal: np.ndarray, padded_signal: np.ndarray) -> np
     """
     return padded_signal[:original_signal.shape[0], :original_signal.shape[1]]
 
+
 def denoise(signal: np.ndarray, threshold=0.1, filter=0) -> np.ndarray:
     """
     Denoise a signal by removing the values below a certain threshold
-    :param filter:
-    :param filterfunc:
     :param signal:
     :param threshold: threshold for the values to keep
+    :param filter:
     :return: denoised signal
     """
 

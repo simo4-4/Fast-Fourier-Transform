@@ -210,6 +210,7 @@ def test_high_freq_filter():
 
     plt.show()
 
+
 def denoise_filters_testing(matrix: np.ndarray, fft_mode=False):
     padding = df.pad_signal(matrix)
     fft = df.FFT_2D(padding)
@@ -275,9 +276,6 @@ def plot_dft(matrix: np.ndarray):
 
 
 if __name__ == '__main__':
-
-    #denoise_filters_testing(mpimg.imread("moonlanding.png"), fft_mode=True)
-    plot_dft(mpimg.imread("moonlanding.png"))
 
     parser = argparse.ArgumentParser(description='Test the DFT functions')
     parser.add_argument('--all', action='store_true', help='Run the tests')

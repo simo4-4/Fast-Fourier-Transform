@@ -114,22 +114,22 @@ def mode_4():
     Compare the 2D DFT and 2D FFT
     Print the time taken for each function to run for each image size
     """
-    sizes: list[int] = [2 ** x for x in range(5, 10)]
+    sizes: list[int] = [2 ** x for x in range(5, 9)]
     ft_function: list[tuple] = [
         (df.DFT_2D_naive, "2D DFT Naive"),
         (df.FFT_2D, "2D FFT"),
         (np.fft.fft2, "Numpy FFT"),
     ]
-    runs_per_function = 5
+    runs_per_function = 10
 
     data: dict[str, dict[int, list[float]]] = {}
     for (_, function_name) in ft_function:
         data[function_name] = {}
 
     for i, size in enumerate(sizes):
-        # print(f"Image size: {size}x{size}")
+        print(f"Image size: {size}x{size}")
         for j, (function, function_name) in enumerate(ft_function):
-            # print(f"Running {function_name}")
+            print(f"Running {function_name}")
 
             time_taken = []
             for k in range(runs_per_function):
@@ -138,11 +138,11 @@ def mode_4():
                 end = time.time()
 
                 time_taken.append(end - start)
-                # print(f"Run {k}: Time taken: {end - start:.8f}")
+                print(f"Run {k}: Time taken: {end - start:.8f}")
 
             data[function_name][size] = time_taken
-            # print(f"Average time taken: {np.mean(time_taken):.8f}")
-        # print()
+            print(f"Average time taken: {np.mean(time_taken):.8f}")
+        print()
 
     plot_data(data, sizes)
 
@@ -207,6 +207,22 @@ def plot_data(data: dict, keys: list[int]):
     plt.title("Time taken for 2D FFT and Numpy FFT")
     plt.legend()
     plt.savefig("results/fft-vs-numpy.png")
+    plt.show()
+
+    # Point plot with error bars for standard deviation with 2D Naive DFT and 2D FFT
+    for function_name, function_data in means.items():
+        if function_name == "Numpy FFT":
+            continue
+
+        y = [function_data[key] for key in keys]
+        y_error = [std_devs[function_name][key] for key in keys]
+        plt.errorbar(keys, y, yerr=y_error, label=function_name, marker='o', capsize=5, capthick=1)
+
+    plt.xlabel("Image Size (pixels)")
+    plt.ylabel("Time Taken (s)")
+    plt.title("Time taken for 2D Naive DFT and 2D FFT")
+    plt.legend()
+    plt.savefig("results/naive-vs-fft.png")
     plt.show()
 
 
