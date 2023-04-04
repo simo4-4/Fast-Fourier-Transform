@@ -5,6 +5,7 @@ import math
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from matplotlib.colors import LogNorm
 
 
 def test_1D_DFT():
@@ -261,12 +262,14 @@ def plot_dft(matrix: np.ndarray):
     plt.title("Original Image")
 
     plt.subplot(2, 2, 2)
-    plt.imshow(np.log(np.abs(fft)), cmap='gray')
+    plt.imshow((np.abs(fft)), cmap='gray', norm=LogNorm())
     plt.title("DFT")
+    plt.colorbar()
 
     plt.subplot(2, 2, 3)
-    plt.imshow(np.log(np.abs(np.fft.fft2(padding))), cmap='gray')
+    plt.imshow((np.abs(np.fft.fft2(padding))), cmap='gray', norm=LogNorm())
     plt.title("DFT using numpy")
+    plt.colorbar()
 
     plt.show()
 
