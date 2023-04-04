@@ -22,6 +22,7 @@ def mode_1(matrix: np.ndarray):
 
     plt.subplot(1, 2, 2)
     plt.imshow(np.abs(fft), cmap='gray', norm=LogNorm())
+    plt.colorbar()
     plt.title("FFT")
 
     plt.show()
