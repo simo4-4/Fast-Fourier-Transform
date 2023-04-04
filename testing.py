@@ -209,8 +209,72 @@ def test_high_freq_filter():
 
     plt.show()
 
+def denoise_filters_testing(matrix: np.ndarray, fft_mode=False):
+    padding = df.pad_signal(matrix)
+    fft = df.FFT_2D(padding)
+
+    #arrays with filter names
+    filter_names = ["High Low", "Low", "High", "Square", "Magnitude"]
+
+    # Show original image
+    plt.figure(figsize=(8, 8))
+    plt.title("Denoised Images")
+
+    plt.subplot(3, 3, 1)
+    plt.imshow(matrix, cmap='gray')
+    plt.title("Original Image")
+
+    threshold = 0.1
+
+    for i, filter_name in enumerate(filter_names):
+
+        if fft_mode:
+            fft_denoised = df.denoise(fft, threshold, filter=i)
+
+            plt.subplot(3, 3, i + 2)
+            plt.imshow(np.log(np.abs(fft_denoised)), cmap='gray')
+            plt.title(f"{filter_name}")
+
+        else:
+            fft_denoised = df.denoise(fft, threshold,  filter=i)
+            inverse = df.IFFT_2D(fft_denoised)
+            inverse = df.remove_padding(matrix, inverse)
+
+            plt.subplot(3, 3, i + 2)
+            plt.imshow((np.abs(inverse)), cmap='gray')
+            plt.title(f"{filter_name}")
+
+
+    plt.show()
+
+
+# plot moonlanging.png, its DFT and DFT using numpy
+def plot_dft(matrix: np.ndarray):
+    padding = df.pad_signal(matrix)
+    fft = df.FFT_2D(padding)
+
+    plt.figure(figsize=(8, 8))
+    plt.title("DFT Images")
+
+    plt.subplot(2, 2, 1)
+    plt.imshow(matrix, cmap='gray')
+    plt.title("Original Image")
+
+    plt.subplot(2, 2, 2)
+    plt.imshow(np.log(np.abs(fft)), cmap='gray')
+    plt.title("DFT")
+
+    plt.subplot(2, 2, 3)
+    plt.imshow(np.log(np.abs(np.fft.fft2(padding))), cmap='gray')
+    plt.title("DFT using numpy")
+
+    plt.show()
+
 
 if __name__ == '__main__':
+
+    #denoise_filters_testing(mpimg.imread("moonlanding.png"), fft_mode=True)
+    plot_dft(mpimg.imread("moonlanding.png"))
 
     parser = argparse.ArgumentParser(description='Test the DFT functions')
     parser.add_argument('--all', action='store_true', help='Run the tests')

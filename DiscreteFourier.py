@@ -183,10 +183,11 @@ def remove_padding(original_signal: np.ndarray, padded_signal: np.ndarray) -> np
     """
     return padded_signal[:original_signal.shape[0], :original_signal.shape[1]]
 
-
-def denoise(signal: np.ndarray, threshold=0.1) -> np.ndarray:
+def denoise(signal: np.ndarray, threshold=0.1, filter=0) -> np.ndarray:
     """
     Denoise a signal by removing the values below a certain threshold
+    :param filter:
+    :param filterfunc:
     :param signal:
     :param threshold: threshold for the values to keep
     :return: denoised signal
@@ -196,7 +197,18 @@ def denoise(signal: np.ndarray, threshold=0.1) -> np.ndarray:
     rows, cols = signal.shape
 
     # filter signal
-    signal = signal * high_low_frequency_filter(signal.shape, threshold)
+    if filter == 0:
+        signal = signal * high_low_frequency_filter(signal.shape, threshold)
+    elif filter == 1:
+        signal = signal * low_frequency_filter(signal.shape, threshold)
+    elif filter == 2:
+        signal = signal * high_frequency_filter(signal.shape, threshold)
+    elif filter == 3:
+        signal = signal * rectangle_filter(signal.shape, threshold)
+    elif filter == 4:
+        signal = low_magnitude(signal, threshold)
+    else:
+        raise ValueError("Invalid filter")
 
     total = rows * cols
     total_non_zeros = np.count_nonzero(signal)
@@ -339,3 +351,30 @@ def inverse_rectangle_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
     filter[int(N * threshold):int(N * (1 - threshold)), int(M * threshold):int(M * (1 - threshold))] = 1
 
     return filter
+
+
+def low_frequency_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.ones((N, M))
+    filter.T[int(M * threshold):int(M * (1 - threshold))] = 0
+
+    return filter
+
+
+def inverse_low_frequency_filter(dimensions: tuple, threshold=0.1) -> np.ndarray:
+    N, M = dimensions
+
+    # Create a 2D filter
+    filter = np.zeros((N, M))
+    filter[:int(N * threshold), :] = 1
+    filter[:, :int(M * threshold)] = 1
+
+    return filter
+
+
+# keep coefficients below certain threshold using np max
+def low_magnitude(signal, threshold=0.5):
+    threshold = np.max(signal) * threshold
+    return np.where(abs(signal) <= threshold, signal, 0)

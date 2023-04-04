@@ -47,11 +47,11 @@ def mode_2(matrix: np.ndarray):
     plt.show()
 
 
-def mode_2_testing(matrix: np.ndarray):
+def mode_2_testing(matrix: np.ndarray, fft_mode=False):
     padding = df.pad_signal(matrix)
     fft = df.FFT_2D(padding)
 
-    denoise_levels = [0.05, 0.08, 0.085, 0.09, 0.1, 0.2, 0.35, 0.45]
+    denoise_levels = [0.05, 0.08, 0.085, 0.09, 0.1, 0.2, 0.35, 0.95]
 
     # Show original image
     plt.figure(figsize=(8, 8))
@@ -61,16 +61,26 @@ def mode_2_testing(matrix: np.ndarray):
     plt.imshow(matrix, cmap='gray')
     plt.title("Original Image")
 
+    filtertype = 2
+
     for i, denoise_level in enumerate(denoise_levels):
-        fft_denoised = df.denoise(fft, denoise_level)
-        inverse = df.IFFT_2D(fft_denoised)
-        inverse = df.remove_padding(matrix, inverse)
 
-        # print(f"Denoised {denoise_level}. Estimated noise level: {df.get_noise_level(inverse)}")
+        if fft_mode:
+            fft_denoised = df.denoise(fft, denoise_level, filter=filtertype)
 
-        plt.subplot(3, 3, i + 2)
-        plt.imshow(np.abs(inverse), cmap='gray')
-        plt.title(f"D Level: {denoise_level}")
+            plt.subplot(3, 3, i + 2)
+            plt.imshow(np.log(np.abs(fft_denoised)), cmap='gray')
+            plt.title(f"D Level: {denoise_level}")
+
+        else:
+            fft_denoised = df.denoise(fft, denoise_level, filter=filtertype)
+            inverse = df.IFFT_2D(fft_denoised)
+            inverse = df.remove_padding(matrix, inverse)
+
+            plt.subplot(3, 3, i + 2)
+            plt.imshow((np.abs(inverse)), cmap='gray')
+            plt.title(f"D Level: {denoise_level}")
+
 
     plt.show()
 
@@ -79,7 +89,7 @@ def mode_3(matrix: np.ndarray):
     padding = df.pad_signal(matrix)
     fft = df.FFT_2D(padding)
 
-    compression_levels = [0.0, 0.1, 0.25, 0.5, 0.70, 0.95]
+    compression_levels = [0.0, 0.25, 0.5, 0.8, 0.90, 0.98]
 
     plt.figure(figsize=(12, 8))
 
@@ -93,7 +103,7 @@ def mode_3(matrix: np.ndarray):
                    fft_compressed[fft_compressed != 0])
 
         plt.subplot(2, 3, i + 1)
-        plt.imshow(np.abs(inverse), cmap='gray')
+        plt.imshow((np.abs(inverse)), cmap='gray')
         plt.title(f"Compression Level: {compression_level * 100}%")
 
     plt.show()
@@ -104,7 +114,7 @@ def mode_4():
     Compare the 2D DFT and 2D FFT
     Print the time taken for each function to run for each image size
     """
-    sizes: list[int] = [2 ** x for x in range(2, 7)]
+    sizes: list[int] = [2 ** x for x in range(5, 10)]
     ft_function: list[tuple] = [
         (df.DFT_2D_naive, "2D DFT Naive"),
         (df.FFT_2D, "2D FFT"),
